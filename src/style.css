@@ -19,3 +19,8 @@
 	li {
 		list-style-type:circle ;
 	}
+
+	.hidden{
+		display: none;
+		visibility: hidden;
+	}
