@@ -27,13 +27,11 @@
 	}
 
 	.note {
-		background-color: #fffff4;
-		color: #072;
+		background-color: #777;
+		color: #fffff4;
 		font-size: 24px;
 		font-weight: normal!important;
 	}
 
 	.even {
-		background-color: #fffff4;
-		color: #333;
 	}
