@@ -6,7 +6,8 @@
 	body {
 		background-color: #fffff4;
 		white-space: pre-wrap;
-		font-size: 21px;
+		font-size: 24px;
+		font-weight: bold;
 		line-height: 34px;
 		padding: 8px 0px 10px 10px;
 	}
@@ -23,4 +24,15 @@
 	.hidden{
 		display: none;
 		visibility: hidden;
+	}
+
+	.note {
+		background-color: #fffff4;
+		color: #333;
+		font-weight: normal!important;
+	}
+
+	.even {
+		background-color: #fffff4;
+		color: #333;
 	}
