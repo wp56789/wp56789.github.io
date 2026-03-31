@@ -7,7 +7,7 @@
 		background-color: #fffff4;
 		white-space: pre-wrap;
 		font-size: 24px;
-		color: #081;
+		color: #222;
 		line-height: 34px;
 		padding: 8px 0px 10px 10px;
 	}
@@ -28,7 +28,8 @@
 
 	.note {
 		background-color: #fffff4;
-		color: #333;
+		color: #072;
+		font-size: 24px;
 		font-weight: normal!important;
 	}
 
