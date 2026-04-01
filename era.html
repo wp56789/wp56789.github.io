@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>纪元对照转换器[AI生成]</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/9.1.1/bignumber.min.js"></script>
+    <title>纪元对照计算器[AI生成]</title>
+    <!-- BigNumber.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/bignumber.js@9.1.1/bignumber.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -14,20 +15,32 @@
         
         body {
             font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
-            font-size: 1.4em;
-            background-color: #f5f5f5;
+            background: #d9d9d0;
             color: #333;
-            line-height: 2.0;
+            line-height: 1.6;
+            min-height: 100vh;
             padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
         }
         
         .container {
-            background-color: white;
-            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 5px #ccc;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff9966, #ff5e62);
         }
         
         h1 {
@@ -35,15 +48,27 @@
             color: #2c3e50;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid #eee;
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
         
         .input-section {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 10px;
             margin-bottom: 30px;
-            border-left: 5px solid #3498db;
+            border-left: 5px solid #667eea;
         }
         
         .input-group {
@@ -55,37 +80,52 @@
         
         label {
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1.2em;
             color: #2c3e50;
+            min-width: 120px;
         }
         
         input[type="number"] {
-            padding: 12px 15px;
+            padding: 14px 20px;
             border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 1.2em;
-            width: 200px;
-            transition: border-color 0.3s;
+            border-radius: 8px;
+            font-size: 1.3em;
+            width: 220px;
+            transition: all 0.3s;
+            background: white;
         }
         
         input[type="number"]:focus {
-            border-color: #3498db;
+            border-color: #667eea;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         button {
-            background-color: #3498db;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
+            padding: 14px 28px;
+            border-radius: 8px;
             font-size: 1.1em;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            font-weight: bold;
         }
         
         button:hover {
-            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(102, 126, 234, 0.4);
+        }
+        
+        button#resetBtn {
+            background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
         }
         
         .result-section {
@@ -94,13 +134,17 @@
         
         .result-box {
             background-color: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 25px;
             margin-top: 20px;
             border: 1px solid #e9ecef;
             white-space: pre-line;
             font-family: "Microsoft YaHei", "Segoe UI", monospace;
+            font-size: 1.25em;
             line-height: 1.8;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .red-text {
@@ -112,22 +156,37 @@
             text-align: center;
             margin: 20px 0;
             color: #7f8c8d;
+            position: relative;
         }
+        
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #bdc3c7, transparent);
+        }
+        
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
         
         .section-title {
             color: #2c3e50;
             margin: 25px 0 15px 0;
             padding-bottom: 8px;
             border-bottom: 1px dashed #bdc3c7;
+            font-size: 1.3em;
         }
         
         .note {
-            background-color: #fff8e1;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 20px;
-            border-left: 4px solid #ffc107;
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            padding: 18px;
+            border-radius: 8px;
+            margin-top: 25px;
+            border-left: 5px solid #ffc107;
             font-size: 0.95em;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
         }
         
         .footer {
@@ -139,9 +198,25 @@
             border-top: 1px solid #eee;
         }
         
+        /* 滚动条样式 */
+        .result-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .result-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .result-box::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+        
+        /* 响应式设计 */
         @media (max-width: 768px) {
             .container {
-                padding: 15px;
+                padding: 20px;
             }
             
             .input-group {
@@ -153,21 +228,42 @@
                 width: 100%;
             }
             
+            .btn-group {
+                flex-direction: column;
+            }
+            
             button {
                 width: 100%;
             }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-box {
+            animation: fadeIn 0.5s ease-out;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>纪元对照转换器</h1>
+        <h1>📅 纪元对照计算器[AI.Demo]</h1>
         
         <div class="input-section">
             <div class="input-group">
-                <label for="yearInput">请输入公元年份：</label>
+                <label for="yearInput">公元年份：</label>
                 <input type="number" id="yearInput" value="2024" min="-3000" max="3000" step="1">
-                <button id="calculateBtn">计算纪元对照</button>
+                <div class="btn-group">
+                    <button id="calculateBtn">计算</button>
+                    <button id="resetBtn">重置</button>
+                </div>
             </div>
         </div>
         
@@ -179,18 +275,22 @@
         </div>
         
         <div class="note">
-            <strong>说明：</strong> 本工具计算指定公元年份对应的各种纪元年份，包括佛历、孔历、雍历等，以及历史人物的生卒纪念年。
+            <strong>📋 说明：</strong> 本工具计算指定公元年份对应的各种纪元年份，包括佛历、孔历、雍历等，以及历史人物的生卒纪念年。使用BigNumber.js库确保大数运算的精确性。
         </div>
         
         <div class="footer">
-            纪元对照转换工具 | 基于PHP版本转换
+            纪元对照计算工具 | 基于PHP版本转换 | 使用BigNumber.js
         </div>
     </div>
 
     <script>
+        // 使用BigNumber.js
+        const BigNumber = window.BigNumber;
+        
         document.addEventListener('DOMContentLoaded', function() {
             const yearInput = document.getElementById('yearInput');
             const calculateBtn = document.getElementById('calculateBtn');
+            const resetBtn = document.getElementById('resetBtn');
             const resultOutput = document.getElementById('resultOutput');
             
             // 初始计算
@@ -198,6 +298,12 @@
             
             // 点击按钮计算
             calculateBtn.addEventListener('click', calculateEra);
+            
+            // 重置按钮
+            resetBtn.addEventListener('click', function() {
+                yearInput.value = '2024';
+                calculateEra();
+            });
             
             // 输入框按回车计算
             yearInput.addEventListener('keyup', function(event) {
@@ -210,81 +316,161 @@
                 const id = parseInt(yearInput.value) || 0;
                 let output = '';
                 
-                // 历史人物信息
-                output += "孔子（前551年9月28日—前479年）<br/>";
-                output += "赵武灵王（前339* —前295年）<br/>";
-                output += "嬴政（前259年—前210年）<br/>";
-                output += "刘邦（前256年/前247年－前195年6月1日）<br/><br/>";
+                // 分隔线
+                output += "<br>﹍ ﹍ ﹍<br><br><span class='red-text'>〔公元" + id + "〕</span><br><br>";
                 
-                output += "独孤信（503年~557年）<br/>";
-                output += "李世民（599年1月23日—649年7月10日）贞观（627年正月—649年十二月）<br/><br/>";
+                // 纪元计算
+                output += "佛历" + flag(id, -544) + "年<br><br>";
                 
-                output += "玄奘（602年—645年—664年）<br/>";
-                output += "刘如意（公元前*205年~公元前194年）<br/>";
-                output += "周昌（？－公元前192年）<br/>";
+                output += "孔历" + flag(id, -551) + "年<br>";
+                output += "孔丘" + flag(id, -479) + "年<br><br>";
                 
-                output += "<br/><br/><br/>";
+                output += "雍历" + flag(id, -339) + "年<br>";
+                output += "灵丘" + flag(id, -295) + "年<br><br>";
                 
-                output += "<br/>﹍ ﹍ ﹍<br/><br/><span class='red-text'>〔公元" + id + "〕</span><br/><br/>";
+                output += "政历" + flag(id, -259) + "年<br>";
+                output += "始皇" + flag(id, -221) + "年<br>";
+                output += "沙丘" + flag(id, -210) + "年<br><br>";
                 
-                output += "佛历" + flag(id, -544) + "年<br/><br/>";
+                output += "太宗" + flag(id, 599) + "年<br>";
+                output += "贞观" + flag(id, 627) + "年<br>";
+                output += "世民" + flag(id, 649) + "年<br><br>";
                 
-                output += "孔历" + flag(id, -551) + "年，孔丘" + flag(id, -479) + "年<br/><br/>";
+                output += "陈祎" + flag(id, 602) + "年<br>";
+                output += "玄奘" + flag(id, 645) + "年<br>";
+                output += "三藏" + flag(id, 664) + "年<br><br>";
                 
-                output += "雍历" + flag(id, -339) + "年，灵丘" + flag(id, -295) + "年<br/><br/>";
-                output += "正历" + flag(id, -259) + "年，沙丘" + flag(id, -210) + "年<br/><br/>";
+                output += "三子如意" + flag(id, -205) + "年<br>";
+                output += "代王如意" + flag(id, -200) + "年<br>";
+                output += "赵王如意" + flag(id, -198) + "年<br>";
+                output += "隐王如意" + flag(id, -194) + "年<br>";
+                output += "周昌百昌" + flag(id, -192) + "年<br><br>";
                 
-                output += "太宗" + flag(id, 599) + "年，贞观" + flag(id, 627) + "年，世民" + flag(id, 649) + "年";
-                output += "<br/><br/>";
+                output += "行者" + flag(id, 1506) + "年<br>";
+                output += "兔本" + flag(id, 1543) + "年<br>";
+                output += "悟空" + flag(id, 1579) + "年<br><br>";
                 
-                output += "陈祎" + flag(id, 602) + "年，玄奘" + flag(id, 645) + "年，三藏" + flag(id, 664) + "年";
+                output += "立极" + flag(id, 1568) + "年<br>";
+                output += "崇祯" + flag(id, 1628) + "年<br>";
+                output += "謄本" + flag(id, 1635) + "年<br>";
+                output += "石笥" + flag(id, 1637) + "年<br><br>";
                 
-                output += "<br/><br/>";
+                output += "灵霄" + flag(id, -195) + "年<br>";
+                output += "地府" + flag(id, 557) + "年<br>";
                 
-                output += "如意" + flag(id, -205) + "年，代王" + flag(id, -200) + "年，赵王" + flag(id, -198) + "年，隐王" + flag(id, -194) + "年，";
-                output += "周昌" + flag(id, -192) + "年";
-                output += "<br/><br/>";
+                output += "<br><br>※ 潮音寺纪元<br><br>";
                 
-                output += "行者" + flag(id, 1506) + "年，兔本" + flag(id, 1543) + "年，悟空" + flag(id, 1579) + "年";
-                output += "<br/><br/>";
+                // 潮音寺纪元部分
+                output += "赵语∶[todo] ";
+                output += "<br>";
+
+                output += "秦风∶[" + flag(id, -221) + "," + flag(id, -207) + "] ";
+                output += "始皇[" + flag(id, -259) + "," + flag(id, -210) + "] ";
+                output += "<br>";
                 
-                output += "立极" + flag(id, 1568) + "年，*崇祯" + flag(id, 1628) + "年，謄本" + flag(id, 1635) + "年，石笥" + flag(id, 1637) + "年";
-                output += "<br/><br/>";
+                output += "楚歌∶[" + flag(id, -206) + "," + flag(id, -202) + "] ";
+                output += "霸王[" + flag(id, -232) + "," + flag(id, -202) + "] ";
+                output += "<br>";
                 
-                output += "灵霄" + flag(id, -195) + "年，地府" + flag(id, 557) + "年";
+                output += "汉赋∶[" + flag(id, -202) + "," + flag(id, 220) + "] ";
+                output += "刘邦[" + flag(id, -256) + "," + flag(id, -195) + "] ";
+                output += "刘彻[" + flag(id, -156) + "," + flag(id, -87) + "] ";
+                output += "卫青[*," + flag(id, -106) + "] ";
+                output += "霍去病[" + flag(id, -140) + "," + flag(id, -117) + "] ";
+                output += "<br>";
                 
-                output += "<br/><br/><br/><br/>";
+                output += "唐诗∶[" + flag(id, 618) + "," + flag(id, 907) + "] ";
+                output += "太宗[" + flag(id, 599) + "," + flag(id, 649) + "] ";
+                output += "武曌[" + flag(id, 624) + "," + flag(id, 705) + "] ";
+                output += "隆基[" + flag(id, 685) + "," + flag(id, 762) + "] ";
+                output += "李白[" + flag(id, 701) + "," + flag(id, 762) + "] ";
+                output += "高适[*" + flag(id, 704) + "," + flag(id, 765) + "] ";
+                output += "颜真卿[*" + flag(id, 709) + "," + flag(id, 785) + "] ";
+                output += "杜甫[" + flag(id, 712) + "," + flag(id, 770) + "] ";
+                output += "李商隐[*" + flag(id, 813) + "," + flag(id, 858) + "] ";
+                output += "<br>";
                 
-                output += "<br/><br/><span class='red-text'>〔三才定位〕（☲ 儒释真道）</span><br/><br/>";
-                output += era(id, {"天道孔历": -551, "地理孔丘": -479, "觉悟佛历": -544});
+                output += "宋词∶[" + flag(id, 960) + "," + flag(id, 1127) + "," + flag(id, 1279) + "] ";
+                output += "赵匡胤[" + flag(id, 927) + "," + flag(id, 976) + "] ";
+                output += "赵光义[" + flag(id, 939) + "," + flag(id, 997) + "] ";
+                output += "苏轼[" + flag(id, 1037) + "," + flag(id, 1101) + "] ";
+                output += "岳飞[" + flag(id, 1103) + "," + flag(id, 1142) + "] ";
+                output += "赵构[" + flag(id, 1107) + "," + flag(id, 1187) + "] ";
+                output += "<br>";
+
+                output += "元曲∶[" + flag(id, 1206) + "," + flag(id, 1271) + "," + flag(id, 1368) + "] ";
+                output += "铁木真[" + flag(id, 1162) + "," + flag(id, 1227) + "] ";
+                output += "忽必烈[" + flag(id, 1215) + "," + flag(id, 1294) + "] ";
+                output += "郭守敬[" + flag(id, 1231) + "," + flag(id, 1316) + "] ";
+                output += "关汉卿[*" + flag(id, 1234) + "," + flag(id, 1309) + "] ";
+                output += "<br>";
                 
-                output += "<br/><br/><span class='red-text'>〔三才定位〕（☰ 儒释正道）</span><br/><br/>";
-                output += era(id, {"天才佛历": -544, "地才孔历": -551, "人才正历": -259});
+                output += "明音∶[" + flag(id, 1368) + "," + flag(id, 1644) + "] ";
+                output += "朱元璋[" + flag(id, 1328) + "," + flag(id, 1398) + "] ";
+                output += "施耐庵[*" + flag(id, 1296) + "," + flag(id, 1372) + "] ";
+                output += "罗贯中[*" + flag(id, 1330) + ",*" + flag(id, 1400) + "] ";
+                output += "朱棣[" + flag(id, 1360) + "," + flag(id, 1424) + "] ";
+                output += "祝允明[" + flag(id, 1461) + "," + flag(id, 1527) + "] ";
+                output += "唐寅[" + flag(id, 1470) + "," + flag(id, 1524) + "] ";
+                output += "文徵明[" + flag(id, 1470) + "," + flag(id, 1559) + "] ";
+                output += "徐祯卿[" + flag(id, 1479) + "," + flag(id, 1511) + "] ";
+                output += "吴承恩[*" + flag(id, 1504) + "," + flag(id, 1582) + "] ";
+                output += "<br>";
                 
-                output += "<br/><br/><span class='red-text'>〔三才定位〕（☲ 儒释法道）</span><br/><br/>";
-                output += era(id, {"天界佛历": -544, "地界孔丘": -479, "人界正历": -259});
+                // 三才定位等计算
+                output += "<br><br>※ 三才定位（☲ 儒释真道）<br>";
+                output += era(id, {"天道/孔历": -551, "地理/孔丘": -479, "觉悟/佛历": -544});
                 
-                output += "<br/><br/><span class='red-text'>〔沙丘定位〕（☷ 儒师坤道）</span><br/><br/>";
+                output += "<br><br>※ 三才定位（☰ 儒释正道）<br>";
+                output += era(id, {"佛历": -544, "孔历": -551, "政历": -259});
+                
+                output += "<br><br>※ 三才定位（☲ 儒释法道）<br>";
+                output += era(id, {"天界佛历": -544, "地界孔丘": -479, "人界政历": -259});
+                
+                output += "<br><br>※ 沙丘定位（☷ 儒师坤道）<br>";
                 output += era(id, {"灵台": -295, "孔丘": -479, "沙丘": -210});
                 
-                output += "<br/><br/><span class='red-text'>〔三星定位〕（☰ 儒师乾道）</span><br/><br/>";
-                output += era(id, {"雍历": -339, "正历": -259, "孔历": -551});
+                output += "<br><br>※ 三星定位（☰ 儒师乾道）<br>";
+                output += era(id, {"雍历": -339, "政历": -259, "孔历": -551});
                 
-                output += "<br/><br/><span class='red-text'>〔三界定位〕（☵ 中五载道）</span><br/><br/>";
+                output += "<br><br>※ 三界定位（☵ 中五载道）<br>";
                 output += era(id, {"天界灵霄": -195, "人界贞观": 627, "冥界地府": 557});
                 
-                output += "<br/><br/><span class='red-text'>〔六耳定位〕（☷ 千里之音）</span><br/><br/>";
-                output += era(id, {"赵景王张耳": -203, "赵隐王如意": -198, "赵废王刘隐": -9});
-                output += era(id, {"赵恭王刘恢": -181, "赵共王刘充": -65, "黄中五": 1627});
-
-                const A = era(id, {"赵景王张耳": -203, "赵隐王如意": -198, "赵废王刘隐": -9}, true);
-                const B = era(id, {"赵恭王刘恢": -181, "赵共王刘充": -65, "黄中五": 1627}, true);
+                output += "<br><br>※ 六耳监听（☷ 千里之音）<br>";
+                const A1 = era(id, {"赵景王张耳": -203, "赵隐王如意": -198, "赵废王刘隐": -9}, true);
+                const B1 = era(id, {"赵恭王刘恢": -181, "赵共王刘充": -65, "黄中五": 1627}, true);
+                const addAB1 = A1[0] + B1[0];
+                const mulAB1 = new BigNumber(A1[1]).times(new BigNumber(B1[1])).toString();
+                output += "<br>";
+                output += "（贺∶伽蓝∶" + A1[0] + ' + ' + B1[0] + ' = ' + addAB1 + " " + no_split(addAB1) + "）<br>";
+                output += "（兰∶大乘∶" + A1[1] + ' × ' + B1[1] + ' = ' + mulAB1 + " " + no_split(mulAB1) + "）<br>";
                 
-                const addAB = A[0] + B[0];
-                const mulAB = multiply(A[1], B[1]);
+                output += "<br><br>※ 六皇察理/道（☰ 天行健）<br>";
+                const A2 = era(id, {"秦始皇": -259, "汉武帝": -156, "唐太宗": 598}, true);
+                const B2 = era(id, {"宋太祖": 927, "元世祖": 1162, "明太祖": 1328}, true);
+                const addAB2 = A2[0] + B2[0];
+                const mulAB2 = new BigNumber(A2[1]).times(new BigNumber(B2[1])).toString();
+                output += "<br>";
+                output += "（贺∶伽蓝∶" + A2[0] + ' + ' + B2[0] + ' = ' + addAB2 + " " + no_split(addAB2) + "）<br>";
+                output += "（兰∶大乘∶" + A2[1] + ' × ' + B2[1] + ' = ' + mulAB2 + " " + no_split(mulAB2) + "）<br>";
                 
-                output += "﹍<br/><br/>贺/伽蓝∶<br/>" + A[0] + ' + ' + B[0] + ' = ' + addAB + " <br/>-> " + no_split(addAB) + "<br/><br/>";
-                output += "兰/大乘∶<br/>" + A[1] + ' × ' + B[1] + ' <br/>= ' + mulAB + " <br/>-> " + no_split(mulAB) + "<br/><br/>";
+                output += "<br><br>※ 六皇察理/阅（☱ 兑上缺）<br>";
+                const A3 = era(id, {"秦始皇": -221, "汉武帝": -141, "唐太宗": 626}, true);
+                const B3 = era(id, {"宋太祖": 960, "元太祖": 1206, "明太祖": 1368}, true);
+                const addAB3 = A3[0] + B3[0];
+                const mulAB3 = new BigNumber(A3[1]).times(new BigNumber(B3[1])).toString();
+                output += "<br>";
+                output += "（贺∶伽蓝∶" + A3[0] + ' + ' + B3[0] + ' = ' + addAB3 + " " + no_split(addAB3) + "）<br>";
+                output += "（兰∶大乘∶" + A3[1] + ' × ' + B3[1] + ' = ' + mulAB3 + " " + no_split(mulAB3) + "）<br>";
+                
+                output += "<br><br>※ 六皇察理/寂（☷ 地势坤）<br>";
+                const A4 = era(id, {"秦始皇": -210, "汉武帝": -87, "唐太宗": 649}, true);
+                const B4 = era(id, {"宋太祖": 976, "元世祖": 1294, "明太祖": 1398}, true);
+                const addAB4 = A4[0] + B4[0];
+                const mulAB4 = new BigNumber(A4[1]).times(new BigNumber(B4[1])).toString();
+                output += "<br>";
+                output += "（贺∶伽蓝∶" + A4[0] + ' + ' + B4[0] + ' = ' + addAB4 + " " + no_split(addAB4) + "）<br>";
+                output += "（兰∶大乘∶" + A4[1] + ' × ' + B4[1] + ' = ' + mulAB4 + " " + no_split(mulAB4) + "）<br>";
                 
                 resultOutput.innerHTML = output;
             }
@@ -294,31 +480,25 @@
                     return 1;
                 }
                 if (base > 0) {
-                    // 2 1
                     if (id > base) {
                         return id - base + 1;
                     }
-                    // 2 3
                     if (id < base && id > 0) {
                         return id - base;
                     }
-                    // -1 1
                     if (id < base && id < 0) {
                         return id - base;
                     }
                 }
                 if (base < 0) {
-                    // 1 -2
                     if (id > base && id > 0) {
                         return id - base;
                     }
         
-                    // -1 -2
                     if (id > base && id < 0) {
                         return id - base;
                     }
         
-                    // -2 -1
                     if (id < base && id < 0) {
                         return id - base;
                     }
@@ -329,24 +509,24 @@
             function era(year = 0, vars = {}, returnValues = false) {
                 let title = [];
                 let add = 0;
-                let mul = 1;
+                let mul = new BigNumber(1);
                 let strAdd = "";
                 
                 for (const [k, v] of Object.entries(vars)) {
                     const flagVal = flag(year, v);
                     add += flagVal;
-                    mul = multiply(mul, flagVal);
+                    mul = mul.times(new BigNumber(flagVal));
                     title.push(k + flagVal + "年");
                     strAdd += (flagVal > 0 ? " +" : " ") + parseInt(flagVal);
                 }
                 
                 if (returnValues) {
-                    return [add, mul];
+                    return [add, mul.toString()];
                 }
                 
-                let output = "<br/>" + title.join(' × ') + "<br/>";
-                output += "-> " + mul + " -> " + no_split(mul) + "<br/><br/>";
-                output += "贺字数∶<br/>" + strAdd.trim() + " <br/>= " + add + " -> " + no_split(add) + "<br/><br/>";
+                let output = "<br>（" + title.join(' × ') + "）";
+                output += "-> " + mul.toString() + no_split(mul.toString()) + "<br>";
+                output += "（贺字数∶" + strAdd.trim() + "）= " + add + no_split(add) + "<br>";
                 
                 return output;
             }
@@ -357,17 +537,17 @@
                 let prefix = '';
                 
                 if (split[0] === '-') {
-                    prefix = '[负]';
+                    prefix = '-';
                     split.shift();
                 }
                 
-                const sum = split.reduce((acc, digit) => acc + parseInt(digit), 0);
-                return prefix + split.join('+') + " -> " + prefix + sum;
-            }
-            
-            // 大数乘法（模拟PHP的bcmul）
-            function multiply(a, b) {
-                 return new BigNumber(a).multipliedBy(b).toString();
+                const sum = split.reduce((acc, digit) => {
+                    // 处理非数字字符（如小数点）
+                    const num = parseInt(digit);
+                    return isNaN(num) ? acc : acc + num;
+                }, 0);
+                
+                return " +> " + prefix + sum;
             }
         });
     </script>
