@@ -1243,7 +1243,7 @@ CCTV-4 少儿
 CCTV-5 体育
 CCTV-6 影视
 {电影、剧集、纪录片}
-CCTV-7 乡村
+CCTV-7 农业农村
 CCTV-8 音乐
 
 CCTV-9 国际
