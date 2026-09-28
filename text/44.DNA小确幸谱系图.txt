@@ -1238,7 +1238,7 @@ CCTV-1 新闻
 CCTV-2 经济
 ｛财经｝
 
-CCTV-3 国防
+CCTV-3 国防军事
 CCTV-4 少儿
 CCTV-5 体育
 CCTV-6 影视
